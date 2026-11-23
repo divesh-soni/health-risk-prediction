@@ -1,0 +1,71 @@
+{
+  "best_model_name": "Support Vector Machine",
+  "accuracy": 0.8533,
+  "cv_accuracy": 0.8556,
+  "fill_values": {
+    "Cholesterol": 238.0,
+    "RestingBP": 130.0
+  },
+  "all_results": [
+    {
+      "Model": "Support Vector Machine",
+      "Accuracy": 0.8532608695652174,
+      "Precision": 0.8504672897196262,
+      "Recall": 0.8921568627450981,
+      "F1 Score": 0.8708133971291866,
+      "ROC-AUC": 0.9414155906264945,
+      "CV Accuracy (mean)": 0.8556145745969619,
+      "CV Accuracy (std)": 0.04732886499040658
+    },
+    {
+      "Model": "Gradient Boosting",
+      "Accuracy": 0.8641304347826086,
+      "Precision": 0.8811881188118812,
+      "Recall": 0.8725490196078431,
+      "F1 Score": 0.8768472906403941,
+      "ROC-AUC": 0.9176231468197036,
+      "CV Accuracy (mean)": 0.8542353927872519,
+      "CV Accuracy (std)": 0.01388536879755881
+    },
+    {
+      "Model": "Random Forest",
+      "Accuracy": 0.842391304347826,
+      "Precision": 0.8543689320388349,
+      "Recall": 0.8627450980392157,
+      "F1 Score": 0.8585365853658536,
+      "ROC-AUC": 0.9241989478718317,
+      "CV Accuracy (mean)": 0.852893486161588,
+      "CV Accuracy (std)": 0.0380374304653382
+    },
+    {
+      "Model": "K-Nearest Neighbors",
+      "Accuracy": 0.875,
+      "Precision": 0.883495145631068,
+      "Recall": 0.8921568627450981,
+      "F1 Score": 0.8878048780487805,
+      "ROC-AUC": 0.9417742706838834,
+      "CV Accuracy (mean)": 0.8515422607399123,
+      "CV Accuracy (std)": 0.036721216738332445
+    },
+    {
+      "Model": "Logistic Regression",
+      "Accuracy": 0.8913043478260869,
+      "Precision": 0.8942307692307693,
+      "Recall": 0.9117647058823529,
+      "F1 Score": 0.9029126213592233,
+      "ROC-AUC": 0.9330463892874222,
+      "CV Accuracy (mean)": 0.8474326716988166,
+      "CV Accuracy (std)": 0.029894453595699214
+    },
+    {
+      "Model": "Decision Tree",
+      "Accuracy": 0.7282608695652174,
+      "Precision": 0.7549019607843137,
+      "Recall": 0.7549019607843137,
+      "F1 Score": 0.7549019607843137,
+      "ROC-AUC": 0.7709230033476805,
+      "CV Accuracy (mean)": 0.813325878296524,
+      "CV Accuracy (std)": 0.03252558316222963
+    }
+  ]
+}

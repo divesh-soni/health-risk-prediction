@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health Risk Prediction System</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">＋</span>
+      <div class="brand-text">
+        <span class="brand-title">VitalCheck</span>
+        <span class="brand-subtitle">Health Risk Prediction</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item is-active" data-target="section-diabetes">
+        <span class="nav-icon">01</span> Diabetes Risk
+      </button>
+      <button class="nav-item" data-target="section-heart">
+        <span class="nav-icon">02</span> Heart Disease Risk
+      </button>
+      <button class="nav-item" data-target="section-combined">
+        <span class="nav-icon">03</span> Combined Risk
+      </button>
+      <button class="nav-item" data-target="section-insights">
+        <span class="nav-icon">04</span> Model Insights
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="model-chip">
+        <span class="model-chip-label">Diabetes model</span>
+        <span class="model-chip-value">{{ diabetes_info.best_model_name }} · {{ (diabetes_info.cv_accuracy * 100) | round(1) }}%</span>
+      </div>
+      <div class="model-chip">
+        <span class="model-chip-label">Heart model</span>
+        <span class="model-chip-value">{{ heart_info.best_model_name }} · {{ (heart_info.cv_accuracy * 100) | round(1) }}%</span>
+      </div>
+      <p class="disclaimer">Academic project - not a certified medical diagnostic tool.</p>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <section id="section-diabetes" class="section is-active">
+      <header class="section-header">
+        <p class="eyebrow">Risk Checker · 01</p>
+        <h1>Diabetes Risk</h1>
+        <p class="section-lede">Enter the patient's clinical values below. The model estimates the likelihood of diabetes based on the Pima Indians Diabetes dataset.</p>
+      </header>
+
+      <div class="workspace">
+        <form id="diabetes-form" class="card form-card">
+          <div class="field-grid">
+            <label class="field">
+              <span class="field-label">Pregnancies
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Number of times the patient has been pregnant. More pregnancies is linked with a somewhat higher diabetes risk (gestational diabetes history).
+                    <span class="tooltip-range">Enter 0 if not applicable</span>
+                  </span>
+                </span>
+              </span>
+              <input type="number" name="Pregnancies" min="0" max="20" value="1" required>
+            </label>
+            <label class="field">
+              <span class="field-label">Glucose (mg/dL)
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Plasma glucose from an oral glucose tolerance test. Strongest feature in the model.
+                    <span class="tooltip-range">Normal (fasting): &lt;100 · Prediabetes: 100–125 · Diabetes: ≥126</span>
+                  </span>
+                </span>
+              </span>
+              <input type="number" name="Glucose" min="0" max="300" value="120" required>
+            </label>
+            <label class="field">
+              <span class="field-label">Blood Pressure (mm Hg)
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Diastolic blood pressure - the pressure in the arteries between heartbeats.
+                    <span class="tooltip-range">Normal: &lt;80 mm Hg</span>
+                  </span>
+                </span>
+              </span>
+              <input type="number" name="BloodPressure" min="0" max="200" value="70" required>
+            </label>
+            <label class="field">
+              <span class="field-label">Skin Thickness (mm)
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Triceps skin fold thickness, rough measure of body fat.
+                    <span class="tooltip-range">Typical range: ~10–40 mm</span>
+                  </span>
+                </span>
+              </span>
+              <input type="number" name="SkinThickness" min="0" max="100" value="20" required>
+            </label>
+            <label class="field">
+              <span class="field-label">Insulin (mu U/ml)
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">2-hour serum insulin level after a glucose tolerance test. Very high or very low values can both signal impaired insulin function.
+                    <span class="tooltip-range">Typical fasting range: 16–166 mu U/ml</span>
+                  </span>
+                </span>
+              </span>
+              <input type="number" name="Insulin" min="0" max="900" value="80" required>
+            </label>
+            <label class="field">
+              <span class="field-label">BMI
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Body Mass Index - weight relative to height, used to classify underweight/healthy/overweight/obese.
+                    <span class="tooltip-range">Normal: 18.5–24.9 · Overweight: 25–29.9 · Obese: ≥30</span>
+                  </span>
+                </span>
+              </span>
+              <input type="number" step="0.1" name="BMI" min="0" max="70" value="25" required>
+            </label>
+            <label class="field">
+              <span class="field-label">Diabetes Pedigree Function
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Score based on family history of diabetes. Higher value means stronger family history.
+                    <span class="tooltip-range">Dataset range: ~0.08–2.42 (higher = stronger family history)</span>
+                  </span>
+                </span>
+              </span>
+              <input type="number" step="0.01" name="DiabetesPedigreeFunction" min="0" max="3" value="0.5" required>
+            </label>
+            <label class="field">
+              <span class="field-label">Age
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Patient's age in years. Risk of Type 2 diabetes rises steadily with age, especially after 45.</span>
+                </span>
+              </span>
+              <input type="number" name="Age" min="1" max="120" value="30" required>
+            </label>
+          </div>
+          <button type="submit" class="btn-primary">Predict Diabetes Risk</button>
+        </form>
+
+        <div class="card result-card" id="diabetes-result-card">
+          <p class="result-placeholder">Fill the form and press <strong>Predict</strong> to see the risk estimate here.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-heart" class="section">
+      <header class="section-header">
+        <p class="eyebrow">Risk Checker · 02</p>
+        <h1>Heart Disease Risk</h1>
+        <p class="section-lede">Enter the patient's clinical values below. The model estimates heart disease likelihood based on the UCI Heart Failure dataset.</p>
+      </header>
+
+      <div class="workspace">
+        <form id="heart-form" class="card form-card">
+          <div class="field-grid">
+            <label class="field">
+              <span class="field-label">Age
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Patient's age in years. Heart disease risk increases with age, more sharply after 45 (men) / 55 (women).</span>
+                </span>
+              </span>
+              <input type="number" name="Age" min="1" max="120" value="45" required>
+            </label>
+            <label class="field">
+              <span class="field-label">Sex
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Biological sex. Included because men typically develop heart disease earlier in life than women, on average.</span>
+                </span>
+              </span>
+              <select name="Sex">
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field-label">Chest Pain Type
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">The pattern of chest pain reported.
+                    <span class="tooltip-range">TA: classic exertional pain · ATA: atypical pain · NAP: non-heart-related pain · ASY: no pain at all (silent - often the most concerning)</span>
+                  </span>
+                </span>
+              </span>
+              <select name="ChestPainType">
+                <option value="ATA">ATA - Atypical Angina</option>
+                <option value="NAP">NAP - Non-Anginal Pain</option>
+                <option value="ASY">ASY - Asymptomatic</option>
+                <option value="TA">TA - Typical Angina</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field-label">Resting Blood Pressure (mm Hg)
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Systolic blood pressure measured while resting (the "top number" in a BP reading).
+                    <span class="tooltip-range">Normal: &lt;120 · Elevated: 120–129 · High (Stage 1): 130–139 · High (Stage 2): ≥140</span>
+                  </span>
+                </span>
+              </span>
+              <input type="number" name="RestingBP" min="0" max="250" value="130" required>
+            </label>
+            <label class="field">
+              <span class="field-label">Cholesterol (mg/dL)
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Total serum cholesterol in the blood. High levels contribute to artery blockages over time.
+                    <span class="tooltip-range">Desirable: &lt;200 · Borderline High: 200–239 · High: ≥240</span>
+                  </span>
+                </span>
+              </span>
+              <input type="number" name="Cholesterol" min="0" max="700" value="200" required>
+            </label>
+            <label class="field">
+              <span class="field-label">Fasting Blood Sugar &gt; 120 mg/dL?
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Is fasting blood sugar above 120 mg/dL?
+                    <span class="tooltip-range">Normal fasting glucose: &lt;100 mg/dL</span>
+                  </span>
+                </span>
+              </span>
+              <select name="FastingBS">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field-label">Resting ECG
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Electrocardiogram result while at rest, showing the heart's electrical activity.
+                    <span class="tooltip-range">Normal: no abnormality · ST: ST-T wave abnormality (possible ischemia) · LVH: thickened heart wall, often from long-term high blood pressure</span>
+                  </span>
+                </span>
+              </span>
+              <select name="RestingECG">
+                <option value="Normal">Normal</option>
+                <option value="ST">ST - ST-T abnormality</option>
+                <option value="LVH">LVH - Left Ventricular Hypertrophy</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field-label">Max Heart Rate Achieved
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">The highest heart rate reached during a treadmill/exercise stress test. A lower-than-expected peak can indicate the heart isn't responding normally to exertion.
+                    <span class="tooltip-range">Rough healthy max ≈ 220 − age (beats per minute)</span>
+                  </span>
+                </span>
+              </span>
+              <input type="number" name="MaxHR" min="40" max="250" value="150" required>
+            </label>
+            <label class="field">
+              <span class="field-label">Exercise-Induced Angina?
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">Chest pain during exercise or physical work.</span>
+                </span>
+              </span>
+              <select name="ExerciseAngina">
+                <option value="N">No</option>
+                <option value="Y">Yes</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field-label">Oldpeak (ST depression)
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">How much the heart's ST segment (part of the ECG waveform) drops during exercise compared to rest. Larger drops suggest the heart muscle is short of oxygen under exertion.
+                    <span class="tooltip-range">0 = no depression (normal) · 1–2 = mild · &gt;2 = more concerning</span>
+                  </span>
+                </span>
+              </span>
+              <input type="number" step="0.1" name="Oldpeak" min="-3" max="7" value="1.0" required>
+            </label>
+            <label class="field">
+              <span class="field-label">ST Slope
+                <span class="info-icon" tabindex="0">i
+                  <span class="tooltip-text">The slope of the ST segment at peak exercise on the ECG.
+                    <span class="tooltip-range">Up: normal, healthy response · Flat: possible reduced blood flow · Down: the most concerning pattern</span>
+                  </span>
+                </span>
+              </span>
+              <select name="ST_Slope">
+                <option value="Up">Up</option>
+                <option value="Flat">Flat</option>
+                <option value="Down">Down</option>
+              </select>
+            </label>
+          </div>
+          <button type="submit" class="btn-primary">Predict Heart Disease Risk</button>
+        </form>
+
+        <div class="card result-card" id="heart-result-card">
+          <p class="result-placeholder">Fill the form and press <strong>Predict</strong> to see the risk estimate here.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-combined" class="section">
+      <header class="section-header">
+        <p class="eyebrow">Overview · 03</p>
+        <h1>Combined Health Risk</h1>
+        <p class="section-lede">Run both predictions first, the combined result shows up here.</p>
+      </header>
+
+      <div class="card" id="combined-card">
+        <p class="result-placeholder" id="combined-placeholder">
+          Do the <strong>Diabetes</strong> and <strong>Heart Disease</strong> predictions first, then come back here.
+        </p>
+
+        <div class="combined-grid" id="combined-grid" hidden>
+          <div class="combined-item">
+            <span class="combined-label">Diabetes</span>
+            <span class="combined-value" id="combined-diabetes-value">-</span>
+            <span class="pill" id="combined-diabetes-pill">-</span>
+          </div>
+          <div class="combined-item">
+            <span class="combined-label">Heart Disease</span>
+            <span class="combined-value" id="combined-heart-value">-</span>
+            <span class="pill" id="combined-heart-pill">-</span>
+          </div>
+        </div>
+
+        <div class="combined-overall" id="combined-overall" hidden>
+          <div class="gauge-wrap">
+            <svg viewBox="0 0 200 120" class="gauge" id="combined-gauge">
+              <path class="gauge-track" d="M10,110 A90,90 0 0 1 190,110"></path>
+              <path class="gauge-fill" d="M10,110 A90,90 0 0 1 190,110"></path>
+            </svg>
+            <div class="gauge-center">
+              <span class="gauge-number" id="combined-gauge-number">0%</span>
+              <span class="gauge-caption">overall score</span>
+            </div>
+          </div>
+          <div class="combined-message">
+            <p class="pill" id="combined-overall-pill">-</p>
+            <p id="combined-message-text"></p>
+            <p class="fine-print">Overall score is just the average of the two probabilities.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-insights" class="section">
+      <header class="section-header">
+        <p class="eyebrow">Transparency · 04</p>
+        <h1>Model Insights</h1>
+        <p class="section-lede">6 models were trained for each disease and the one with the best 5-fold CV accuracy is used in the app.</p>
+      </header>
+
+      <div class="insights-tabs">
+        <button class="insights-tab-btn is-active" data-insights="diabetes">Diabetes Models</button>
+        <button class="insights-tab-btn" data-insights="heart">Heart Disease Models</button>
+      </div>
+
+      <div class="card insights-panel is-active" id="insights-diabetes">
+        <table class="metrics-table" id="table-diabetes"></table>
+        <div class="plot-grid">
+          <figure>
+            <img src="{{ url_for('static', filename='plots/diabetes_model_comparison.png') }}" alt="Diabetes model accuracy comparison">
+            <figcaption>Accuracy Comparison</figcaption>
+          </figure>
+          <figure>
+            <img src="{{ url_for('static', filename='plots/diabetes_confusion_matrix.png') }}" alt="Diabetes confusion matrix">
+            <figcaption>Confusion Matrix</figcaption>
+          </figure>
+          <figure>
+            <img src="{{ url_for('static', filename='plots/diabetes_feature_importance.png') }}" alt="Diabetes feature importance">
+            <figcaption>Feature Importance</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="card insights-panel" id="insights-heart">
+        <table class="metrics-table" id="table-heart"></table>
+        <div class="plot-grid">
+          <figure>
+            <img src="{{ url_for('static', filename='plots/heart_model_comparison.png') }}" alt="Heart disease model accuracy comparison">
+            <figcaption>Accuracy Comparison</figcaption>
+          </figure>
+          <figure>
+            <img src="{{ url_for('static', filename='plots/heart_confusion_matrix.png') }}" alt="Heart disease confusion matrix">
+            <figcaption>Confusion Matrix</figcaption>
+          </figure>
+          <figure>
+            <img src="{{ url_for('static', filename='plots/heart_feature_importance.png') }}" alt="Heart disease feature importance">
+            <figcaption>Feature Importance</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
